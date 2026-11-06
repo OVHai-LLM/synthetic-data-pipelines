@@ -286,6 +286,13 @@ ar = load_dataset("OVHaiLLM/Wikipedia-ActiveReading", "active_reading",
 # artifacts join back onto their source article on (language, src_id) -> (language, id)
 ```
 
+## Models used
+
+| Role | Model | Settings |
+|---|---|---|
+| Strategy generation (stage 1) and artifact writing (stage 2) | [`RedHatAI/gemma-4-26B-A4B-it-FP8-dynamic`](https://huggingface.co/RedHatAI/gemma-4-26B-A4B-it-FP8-dynamic) (FP8 quantization of [`google/gemma-4-26B-A4B-it`](https://huggingface.co/google/gemma-4-26B-A4B-it)) | temperature 0.8, ≤ 2048 generated tokens per artifact, served with vLLM |
+| Token estimates (`token_count_est`) | Qwen2.5 tokenizer ([`Qwen/Qwen2.5-7B-Instruct`](https://huggingface.co/Qwen/Qwen2.5-7B-Instruct)) | per-language tokens-per-character ratios, see Known limitations |
+
 ## How it was built
 
 A two-stage vLLM pipeline. Generator: **`RedHatAI/gemma-4-26B-A4B-it-FP8-Dynamic`** — the MoE

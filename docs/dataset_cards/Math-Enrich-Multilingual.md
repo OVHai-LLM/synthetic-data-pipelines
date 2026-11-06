@@ -295,6 +295,16 @@ text = f"Problem: {r['rewritten_problem']}\n\nSolution: {r['rewritten_solution']
 bad = d.filter(lambda r: r["judge_correctness"] == "no")
 ```
 
+## Models used
+
+| Role | Model | Settings |
+|---|---|---|
+| Rewrite (stage 2) | [`RedHatAI/gemma-4-31B-it-FP8-dynamic`](https://huggingface.co/RedHatAI/gemma-4-31B-it-FP8-dynamic) (FP8 quantization of [`google/gemma-4-31B-it`](https://huggingface.co/google/gemma-4-31B-it)) | temperature 0.8, served with vLLM |
+| Judge (stage 3) | [`RedHatAI/gemma-4-31B-it-FP8-dynamic`](https://huggingface.co/RedHatAI/gemma-4-31B-it-FP8-dynamic) (FP8 quantization of [`google/gemma-4-31B-it`](https://huggingface.co/google/gemma-4-31B-it)), the same model as the rewriter | temperature 0.1, strict-JSON rubric |
+| Token counts (`token_count`) | Qwen2.5 tokenizer ([`Qwen/Qwen2.5-7B-Instruct`](https://huggingface.co/Qwen/Qwen2.5-7B-Instruct)) | |
+
+Seed problems (stage 1) come from deterministic code, not from a model.
+
 ## How it was built
 
 **Stage 1 — seed generation.** 60,000,000 problems from 122 named generators across

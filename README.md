@@ -2,11 +2,11 @@
 
 This repository contains the data generation pipeline for the synthetic datasets used in the pretrained annealing mix of Olala 7A1B.
 
-| Dataset (built) | Description | Scale | Pipeline |
-|---|---|---|---|
-| [`OVHaiLLM/Math-Enrich-Multilingual`](https://huggingface.co/datasets/OVHaiLLM/Math-Enrich-Multilingual) | Programmatic math problems with exact answers, rewritten by an LLM into 30 languages and 7 styles, then graded by an LLM judge | 21.6 M rewrites, 7.37 B tok (17.7 M accepted) | [Math-Enrich](#1-math-enrich-multilingual) |
-| [`OVHaiLLM/Wikipedia-ActiveReading`](https://huggingface.co/datasets/OVHaiLLM/Wikipedia-ActiveReading) | [Active Reading](https://arxiv.org/abs/2508.09494) study artifacts for Wikipedia in 29 non-English languages | 54.0 M artifacts, 40.3 B tok | [AR-Wikipedia](#2-active-reading--wikipedia) |
-| [`OVHaiLLM/ProofWiki-ActiveReading`](https://huggingface.co/datasets/OVHaiLLM/ProofWiki-ActiveReading) | Active Reading study artifacts for ProofWiki theorems (general and Lean-4-oriented) | 185 k artifacts, 0.18 B tok | [AR-ProofWiki](#3-active-reading--proofwiki) |
+| Dataset (built) | Description | Generator model | Scale | Pipeline |
+|---|---|---|---|---|
+| [`OVHaiLLM/Math-Enrich-Multilingual`](https://huggingface.co/datasets/OVHaiLLM/Math-Enrich-Multilingual) | Programmatic math problems with exact answers, rewritten by an LLM into 30 languages and 7 styles, then graded by an LLM judge | [gemma-4-31B-it](https://huggingface.co/RedHatAI/gemma-4-31B-it-FP8-dynamic) (FP8), rewriter and judge | 21.6 M rewrites, 7.37 B tok (17.7 M accepted) | [Math-Enrich](#1-math-enrich-multilingual) |
+| [`OVHaiLLM/Wikipedia-ActiveReading`](https://huggingface.co/datasets/OVHaiLLM/Wikipedia-ActiveReading) | [Active Reading](https://arxiv.org/abs/2508.09494) study artifacts for Wikipedia in 29 non-English languages | [gemma-4-26B-A4B-it](https://huggingface.co/RedHatAI/gemma-4-26B-A4B-it-FP8-dynamic) (FP8) | 54.0 M artifacts, 40.3 B tok | [AR-Wikipedia](#2-active-reading--wikipedia) |
+| [`OVHaiLLM/ProofWiki-ActiveReading`](https://huggingface.co/datasets/OVHaiLLM/ProofWiki-ActiveReading) | Active Reading study artifacts for ProofWiki theorems (general and Lean-4-oriented) | [gemma-4-31B-it](https://huggingface.co/RedHatAI/gemma-4-31B-it-FP8-dynamic) (FP8) | 185 k artifacts, 0.18 B tok | [AR-ProofWiki](#3-active-reading--proofwiki) |
 
 The dataset cards as published are in [`docs/dataset_cards/`](docs/dataset_cards/). They hold
 the full schemas, statistics and known limitations.
@@ -73,7 +73,7 @@ math_generator (122 generators) ──► seeds_<lang>.jsonl ──► vLLM rewr
    `engineering_physics`, `mcq`, `red_herring`, `hidden_operation`) and asks for a rewrite in the
    target language that keeps every number and the final answer. The same model then grades the
    rewrite as strict JSON: correctness yes/no plus naturalness, clarity and difficulty-preservation
-   on 1–5. Model: `RedHatAI/gemma-4-31B-it-FP8-Dynamic`, 4 vLLM servers per node (DP4).
+   on 1–5. Model: `RedHatAI/gemma-4-31B-it-FP8-dynamic`, 4 vLLM servers per node (DP4).
    ```bash
    bash scripts/math_enrich/submit_per_language_enrich.sh                 # 30 jobs, 1 node × 12 h each
    ENRICH_N=10000 ENRICH_LANGUAGES_OVERRIDE="fr de" bash scripts/math_enrich/submit_per_language_enrich.sh
@@ -94,7 +94,7 @@ with the prompts in `prompts_wiki.py`):
   ≤ 2048 tokens, *written in the article's language*.
 
 The result is 6 artifacts per article. Articles are kept if 200 ≤ `token_count` ≤ 6000.
-Generator: `RedHatAI/gemma-4-26B-A4B-it-FP8-Dynamic`, an MoE about 2.5× faster than the 31B dense
+Generator: `RedHatAI/gemma-4-26B-A4B-it-FP8-dynamic`, an MoE about 2.5× faster than the 31B dense
 model at equal quality on low-resource languages.
 
 Throughput tricks that made 29 languages affordable:
@@ -125,7 +125,7 @@ cd scripts/active_reading_proofwiki
 
 The pipeline is the same two-stage one as for Wikipedia, using `prompts.py`. Settings: flavours
 `agnostic` and `lean`, 5 strategies each, theorems with proof ≥ 200 chars, truncated to 8000
-chars, `RedHatAI/gemma-4-31B-it-FP8-Dynamic` (`launch_gemma4_v2.sh`), apply ≤ 4096 tokens. That
+chars, `RedHatAI/gemma-4-31B-it-FP8-dynamic` (`launch_gemma4_v2.sh`), apply ≤ 4096 tokens. That
 gives 18,532 theorems × 10 artifacts. `postprocess/preprocess_active_reading.py` flattens them
 into the annealing jsonl, and `prepare_proofwiki_proofs.py` does the same for the source corpus.
 

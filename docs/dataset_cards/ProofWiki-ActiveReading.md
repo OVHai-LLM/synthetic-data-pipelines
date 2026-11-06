@@ -58,6 +58,14 @@ pw = load_dataset("OVHaiLLM/ProofWiki-ActiveReading", "proofwiki", split="train"
 ar[0]["doc_id"]   # 'proofwiki:Sine_of_Angle_plus_Full_Angle'
 ```
 
+## Models used
+
+| Role | Model | Settings |
+|---|---|---|
+| Strategy generation (stage 1) and artifact writing (stage 2) | [`RedHatAI/gemma-4-31B-it-FP8-dynamic`](https://huggingface.co/RedHatAI/gemma-4-31B-it-FP8-dynamic) (FP8 quantization of [`google/gemma-4-31B-it`](https://huggingface.co/google/gemma-4-31B-it)) | temperature 0.8, ≤ 4096 generated tokens per artifact, served with vLLM |
+| Lean repair attempt (validation only) | [`Goedel-LM/Goedel-Prover-V2-32B`](https://huggingface.co/Goedel-LM/Goedel-Prover-V2-32B) | recovered none of the failing snippets; its outputs are not in this release |
+| Token counts (`token_count`) | Qwen2.5 tokenizer ([`Qwen/Qwen2.5-7B-Instruct`](https://huggingface.co/Qwen/Qwen2.5-7B-Instruct)) | |
+
 ## How it was built
 
 A two-stage vLLM pipeline, `google/gemma-4-31b-it` served as
