@@ -1,4 +1,4 @@
-# synthetic-data-pipelines
+# olala-synthetic-data-pipelines
 
 This repository contains the data generation pipeline for the synthetic datasets used in the pretrained annealing mix of Olala 7A1B.
 
