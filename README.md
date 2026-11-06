@@ -2,7 +2,7 @@
 
 This repository contains the data generation pipeline for the synthetic datasets used in the pretrained annealing mix of Olala 7A1B.
 
-| Dataset | Description | Scale | Pipeline |
+| Dataset (built) | Description | Scale | Pipeline |
 |---|---|---|---|
 | [`OVHaiLLM/Math-Enrich-Multilingual`](https://huggingface.co/datasets/OVHaiLLM/Math-Enrich-Multilingual) | Programmatic math problems with exact answers, rewritten by an LLM into 30 languages and 7 styles, then graded by an LLM judge | 21.6 M rewrites, 7.37 B tok (17.7 M accepted) | [Math-Enrich](#1-math-enrich-multilingual) |
 | [`OVHaiLLM/Wikipedia-ActiveReading`](https://huggingface.co/datasets/OVHaiLLM/Wikipedia-ActiveReading) | [Active Reading](https://arxiv.org/abs/2508.09494) study artifacts for Wikipedia in 29 non-English languages | 54.0 M artifacts, 40.3 B tok | [AR-Wikipedia](#2-active-reading--wikipedia) |
