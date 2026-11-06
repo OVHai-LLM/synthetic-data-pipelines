@@ -2,11 +2,11 @@
 
 This repository contains the data generation pipeline for the synthetic datasets used in the pretrained annealing mix of Olala 7A1B.
 
-| Dataset (built) | Description | Generator model | Scale | Pipeline |
-|---|---|---|---|---|
-| [`OVHaiLLM/Math-Enrich-Multilingual`](https://huggingface.co/datasets/OVHaiLLM/Math-Enrich-Multilingual) | Programmatic math problems with exact answers, rewritten by an LLM into 30 languages and 7 styles, then graded by an LLM judge | [gemma-4-31B-it](https://huggingface.co/RedHatAI/gemma-4-31B-it-FP8-dynamic) (FP8), rewriter and judge | 21.6 M rewrites, 7.37 B tok (17.7 M accepted) | [Math-Enrich](#1-math-enrich-multilingual) |
-| [`OVHaiLLM/Wikipedia-ActiveReading`](https://huggingface.co/datasets/OVHaiLLM/Wikipedia-ActiveReading) | [Active Reading](https://arxiv.org/abs/2508.09494) study artifacts for Wikipedia in 29 non-English languages | [gemma-4-26B-A4B-it](https://huggingface.co/RedHatAI/gemma-4-26B-A4B-it-FP8-dynamic) (FP8) | 54.0 M artifacts, 40.3 B tok | [AR-Wikipedia](#2-active-reading--wikipedia) |
-| [`OVHaiLLM/ProofWiki-ActiveReading`](https://huggingface.co/datasets/OVHaiLLM/ProofWiki-ActiveReading) | Active Reading study artifacts for ProofWiki theorems (general and Lean-4-oriented) | [gemma-4-31B-it](https://huggingface.co/RedHatAI/gemma-4-31B-it-FP8-dynamic) (FP8) | 185 k artifacts, 0.18 B tok | [AR-ProofWiki](#3-active-reading--proofwiki) |
+| Dataset (built) | Description | Scale | Pipeline |
+|---|---|---|---|
+| [`OVHaiLLM/Math-Enrich-Multilingual`](https://huggingface.co/datasets/OVHaiLLM/Math-Enrich-Multilingual) | Programmatic math problems with exact answers, rewritten by an LLM into 30 languages and 7 styles, then graded by an LLM judge 21.6 M rewrites, 7.37 B tok (17.7 M accepted) | [Math-Enrich](#1-math-enrich-multilingual) |
+| [`OVHaiLLM/Wikipedia-ActiveReading`](https://huggingface.co/datasets/OVHaiLLM/Wikipedia-ActiveReading) | [Active Reading](https://arxiv.org/abs/2508.09494) study artifacts for Wikipedia in 29 non-English languages 54.0 M artifacts, 40.3 B tok | [AR-Wikipedia](#2-active-reading--wikipedia) |
+| [`OVHaiLLM/ProofWiki-ActiveReading`](https://huggingface.co/datasets/OVHaiLLM/ProofWiki-ActiveReading) | Active Reading study artifacts for ProofWiki theorems (general and Lean-4-oriented) 185 k artifacts, 0.18 B tok | [AR-ProofWiki](#3-active-reading--proofwiki) |
 
 The dataset cards as published are in [`docs/dataset_cards/`](docs/dataset_cards/). They hold
 the full schemas, statistics and known limitations.
@@ -134,6 +134,20 @@ into the annealing jsonl, and `prepare_proofwiki_proofs.py` does the same for th
   8.4 % compile cleanly.
 - `goedel_retry*.py` with `goedel_retry_dp4.sbatch` runs a repair pass using Goedel-Prover-V2-32B.
   It recovered **0** snippets, so the shipped data does not filter on Lean verdicts.
+
+## Models used
+
+| Dataset | Stage | Model | Settings |
+|---|---|---|---|
+| Math-Enrich | rewrite | [`RedHatAI/gemma-4-31B-it-FP8-dynamic`](https://huggingface.co/RedHatAI/gemma-4-31B-it-FP8-dynamic) | temperature 0.8 |
+| Math-Enrich | judge | same model as the rewriter | temperature 0.1 |
+| Wikipedia-AR | strategies + artifacts | [`RedHatAI/gemma-4-26B-A4B-it-FP8-dynamic`](https://huggingface.co/RedHatAI/gemma-4-26B-A4B-it-FP8-dynamic) | temperature 0.8, ≤ 2048 tok/artifact |
+| ProofWiki-AR | strategies + artifacts | [`RedHatAI/gemma-4-31B-it-FP8-dynamic`](https://huggingface.co/RedHatAI/gemma-4-31B-it-FP8-dynamic) | temperature 0.8, ≤ 4096 tok/artifact |
+| ProofWiki-AR | Lean repair (validation only) | [`Goedel-LM/Goedel-Prover-V2-32B`](https://huggingface.co/Goedel-LM/Goedel-Prover-V2-32B) | not used in the released data |
+| all | token counts | Qwen2.5 tokenizer ([`Qwen/Qwen2.5-7B-Instruct`](https://huggingface.co/Qwen/Qwen2.5-7B-Instruct)) | |
+
+The RedHatAI models are FP8 quantizations of [`google/gemma-4-31B-it`](https://huggingface.co/google/gemma-4-31B-it)
+and [`google/gemma-4-26B-A4B-it`](https://huggingface.co/google/gemma-4-26B-A4B-it), served with vLLM.
 
 ## License
 
