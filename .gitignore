@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+*.egg-info/
+.venv/
+logs/*
+!logs/.gitkeep
+*.jsonl
+*.jsonl.gz
+*.parquet
+configs/site.env

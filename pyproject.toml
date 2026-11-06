@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "synthetic-data-pipelines"
+version = "0.1.0"
+description = "Pipelines behind OVHaiLLM/Math-Enrich-Multilingual, Wikipedia-ActiveReading and ProofWiki-ActiveReading"
+readme = "README.md"
+license = { text = "Apache-2.0" }
+requires-python = ">=3.10"
+dependencies = [
+    "sympy",
+    "z3-solver",
+    "requests",
+    "openai",            # AsyncOpenAI client in math_generator.enrich_async
+]
+
+[project.optional-dependencies]
+proofwiki = ["mwxml", "wikitextparser"]
+lean-dojo = ["pyarrow"]
+postprocess = ["transformers", "click"]   # Qwen2.5 token counts for the annealing jsonl
+serve = ["vllm"]                          # usually built per cluster, see docs/hpc_notes.md
+dev = ["pytest"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
