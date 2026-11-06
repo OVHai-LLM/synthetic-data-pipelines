@@ -37,7 +37,7 @@ pytest                       # runs all generators at every difficulty level
 ```
 
 Generation needs an OpenAI-compatible vLLM server. The SLURM jobs activate a venv (`$VLLM_ENV`)
-and start the servers themselves; see [`docs/hpc_notes.md`](docs/hpc_notes.md).
+and start the servers themselves (see [`docs/hpc_notes.md`](docs/hpc_notes.md)).
 
 **Site config.** Each shell script locates the checkout from `git` and then sources
 `configs/site.env`, or `configs/site.env.example` when that file is missing. The example points
@@ -48,7 +48,7 @@ cp configs/site.env.example configs/site.env     # then edit the paths
 ```
 
 **SLURM.** The `.sbatch` files set no account or partition. Pass them on the command line
-(`sbatch -A <account> -p <partition> ...`) or export `SBATCH_ACCOUNT` / `SBATCH_PARTITION`.
+(`sbatch -A <account> -p <partition> ...`) or export `SBATCH_ACCOUNT` / `SBATCH_PARTITION` env variables.
 The `#SBATCH --output` lines write to `logs/`, relative to the directory you submit from, so
 **run `sbatch` from the repo root**. The `module load` lines are for the cluster the data was
 built on. Adapt them to yours.
@@ -134,15 +134,6 @@ into the annealing jsonl, and `prepare_proofwiki_proofs.py` does the same for th
   8.4 % compile cleanly.
 - `goedel_retry*.py` with `goedel_retry_dp4.sbatch` runs a repair pass using Goedel-Prover-V2-32B.
   It recovered **0** snippets, so the shipped data does not filter on Lean verdicts.
-
-## 4. Release to Hugging Face
-
-The release step (parquet + zstd, sharded per language; cards generated from inventory JSON) was
-done on 2026-08-19 by `build_pw_ar.py`, `build_ar_wiki.py`, `build_wiki_src.py` and
-`build_math_enrich.py`. **Those scripts were written in a temporary session scratchpad and are
-not in this repo.** The cards in `docs/dataset_cards/` are the published versions. If you rebuild
-the Wikipedia source config, read the data-layout traps in [`docs/hpc_notes.md`](docs/hpc_notes.md)
-first.
 
 ## License
 
